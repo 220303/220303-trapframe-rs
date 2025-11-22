@@ -57,34 +57,12 @@ trap_from_user:
     STORE_SP t1, 32         # save sstatus
     STORE_SP t2, 33         # save sepc
 
-    andi t1, t1, 1 << 8     # sstatus.SPP = 1
-    beqz t1, end_trap_from_user
-end_trap_from_kernel:
+    # into trap_handler
+    # BOTH user trap and kernel trap MUST do this !
     mv a0, sp               # first arg is TrapFrame
     la ra, trap_return      # set return address
     j trap_handler
 
-end_trap_from_user:
-    # load callee-saved registers
-    LOAD_SP sp, 0
-    LOAD_SP s0, 0
-    LOAD_SP s1, 1
-    LOAD_SP s2, 2
-    LOAD_SP s3, 3
-    LOAD_SP s4, 4
-    LOAD_SP s5, 5
-    LOAD_SP s6, 6
-    LOAD_SP s7, 7
-    LOAD_SP s8, 8
-    LOAD_SP s9, 9
-    LOAD_SP s10, 10
-    LOAD_SP s11, 11
-    LOAD_SP ra, 12
-    # not callee-saved, but is used to store mhartid
-    LOAD_SP tp, 13
-    addi sp, sp, 14 * XLENB
-
-    ret
 
 .global run_user
 run_user:
