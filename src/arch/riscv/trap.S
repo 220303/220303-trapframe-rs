@@ -12,12 +12,17 @@ trap_entry:
     # will contain 0, and we should continue on the current stack.
     csrrw sp, sscratch, sp
     bnez sp, trap_from_user
+
 trap_from_kernel:
     csrr sp, sscratch
-    addi sp, sp, -34 * XLENB
     # sscratch = previous-sp, sp = kernel-sp
+
 trap_from_user:
+    # 无论是user还是kernel的trap都要在栈上预留空间才能保存寄存器
+    addi sp, sp, -34 * XLENB
+
     # save general registers except sp(x2)
+    # 因为现在的SP是 内核栈/临时内核栈 的地址，无需保存。
     STORE_SP x1, 1
     STORE_SP x3, 3
     STORE_SP x4, 4
